@@ -1,4 +1,26 @@
-# Generalized Covariate Field (GCF): Code and Examples
+# Generalized Covariate Field (GCF): R Code, Data, and Examples
+
+This repository provides the R implementation, example data, and usage examples of the generalized covariate field (GCF) model.
+
+## Paper
+
+**Title**
+
+Generalized covariate field (GCF): spatial-pattern and neighbourhood-distribution feature expansion improves geospatial prediction
+
+**Authors**
+
+Yongze Song (School of Design and the Built Environment, Curtin University, Perth, Australia)
+
+**Abstract**
+
+Spatial prediction forms the basis for decision-making in Earth and environmental sciences, yet prediction accuracy is constrained by spatial heterogeneity and sparse and uneven sampling. Existing methods commonly respond by increasing algorithmic complexity while underusing the spatial information embedded in the covariates themselves. This study develops the generalized covariate field (GCF) to expand the covariate space rather than model complexity through deriving two families of features. First, spatial pattern features characterize local spatial structure, including spatial dependence, heterogeneity, geocomplexity, multiscale variation, and local outlyingness, and are transferable across space. In addition, neighbourhood distribution features summarize covariates through multiscale operators with geoscientific meaning. Finally, high-dimensional features are selected using response-independent functional reductions and spatial-block stability selection. GCF is implemented in a vascular plant species-richness study across the Southwest Australian Floristic Region, and expands 12 covariates into 3,276 candidate predictors. Results show that GCF improves prediction accuracy under both random and spatial-block validation with 8.2–21.1% higher spatial-block cross-validated R² than existing spatial learning models. The findings support the primacy of data hypothesis that enriching the spatial representation of data, rather than only increasing model structural complexity, can substantially improve prediction and provide a basis for data-centric geospatial modelling.
+
+**Keywords**
+
+Geospatial prediction; generalized covariate field; feature expansion; spatial cross-validation; primacy of data
+
+## Method and code
 
 The generalized covariate field (GCF) model is a prediction-oriented method for spatial variables: it expands raw spatial covariates into spatial-pattern and neighbourhood-distribution features and selects a stable subset of them for geospatial prediction. For each covariate `x` observed at projected coordinates, the method first computes spatial-pattern features `psi` (11 spatial operators — LISA, local Geary's c, log local variance, rank-quantile entropy, geocomplexity, log scale-variance, local variogram exponent, and signed z-score and MAD outlier strengths — over a series of buffer radii), then neighbourhood-distribution features `Z_x` (buffer-wise quantiles of the covariate values surrounding each location), reduces the collinear buffer and quantile sweeps to a compact set of interpretable functionals over two scale bands, and finally selects variables by random forest importance combined with spatial-block stability resampling and group voting. No response variable is used at any point of the feature generation; the selected variables feed any downstream regression learner.
 
