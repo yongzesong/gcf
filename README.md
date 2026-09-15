@@ -1,6 +1,29 @@
 # Generalized Covariate Field (GCF): R Code, Data, and Examples
 
-This repository provides the R implementation, example data, and usage examples of the generalized covariate field (GCF) model.
+This repository provides the R implementation, example data, and usage examples of the generalized covariate field (GCF) model, published in the *International Journal of Geographical Information Science* (Song, 2026).
+
+## Resources
+
+- Method article (wiki): https://yongzesong.com/gcf/
+- Online calculator (runs entirely in the browser): https://yongzesong.com/app/gcf/
+- Reproduction tutorial (one-command R pipeline that regenerates the paper's tables): https://yongzesong.com/reproduce/gcf.html
+- Full text of the paper: https://doi.org/10.1080/13658816.2026.2729719
+
+## Citation
+
+Song, Y. (2026). Generalized covariate field (GCF): spatial-pattern and neighbourhood-distribution feature expansion improves geospatial prediction. *International Journal of Geographical Information Science*, 40, 1–29. https://doi.org/10.1080/13658816.2026.2729719
+
+```bibtex
+@article{song2026gcf,
+  title   = {Generalized covariate field ({GCF}): spatial-pattern and neighbourhood-distribution feature expansion improves geospatial prediction},
+  author  = {Song, Yongze},
+  journal = {International Journal of Geographical Information Science},
+  year    = {2026},
+  volume  = {40},
+  pages   = {1--29},
+  doi     = {10.1080/13658816.2026.2729719}
+}
+```
 
 ## Paper
 

@@ -11,6 +11,11 @@
 # Consolidated from the R package `gcf` 0.1.0; function names and signatures
 # are identical to the package.
 #
+# Reference: Song, Y. (2026). Generalized covariate field (GCF): spatial-pattern
+# and neighbourhood-distribution feature expansion improves geospatial
+# prediction. International Journal of Geographical Information Science, 40,
+# 1-29. https://doi.org/10.1080/13658816.2026.2729719
+#
 # Dependencies (install once): sf, spdep, geocomplexity, ranger
 # Requires R >= 4.1.
 #
