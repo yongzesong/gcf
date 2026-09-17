@@ -73,7 +73,7 @@ field <- gcf_field(sim, coords = c("x", "y"), vars = c("x1", "x2", "x3"),
 
 # Select a stable subset with spatial-block stability resampling
 blocks <- gcf_blocks(sim[, c("x", "y")], size = 6)
-sel <- gcf_select(field, y = sim$y1, blocks = blocks)
+sel <- gcf_select(field, y = sim$y1, blocks = blocks, seed = 1)
 sel$selected
 ```
 
@@ -91,4 +91,4 @@ GCF variable selection (rf_imp + spatial-block stability + group voting)
   derived: x1_D_fine_med, x2_D_fine_med, x2_P_gc, x3_D_fine_med, x3_P_gc
 ```
 
-The selection is deterministic for a given seed (`seed = 1` by default; the random forests run single-threaded with a fixed seed).
+The selection is reproducible when a seed is passed: `seed = 1` reproduces the paper's selection (the random forests run single-threaded with the same seed), and the caller's random number generator state is restored on exit. With `seed = NULL` (the default) no seed is set and the procedure follows R's current random number stream.

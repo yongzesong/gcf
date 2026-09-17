@@ -23,9 +23,10 @@ print(field)
 
 # Step 3b: select a stable subset with spatial-block stability resampling.
 # Blocks of 6 x 6 grid units; selection defaults are the paper settings
-# (B = 80 resamples, ktop = 20, pi_thr = 0.6, seed = 1).
+# (B = 80 resamples, ktop = 20, pi_thr = 0.6); seed = 1 reproduces the
+# paper's selection exactly.
 blocks <- gcf_blocks(sim[, c("x", "y")], size = 6)
-sel <- gcf_select(field, y = sim$y1, blocks = blocks)
+sel <- gcf_select(field, y = sim$y1, blocks = blocks, seed = 1)
 print(sel)
 
 # The selected variables (raw covariates plus stable derived variables) are

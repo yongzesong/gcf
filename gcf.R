@@ -1004,14 +1004,15 @@ summary.gcf_field <- function(object, ...) {
 # =============================================================================
 
 # Core selection loop: X is the reduced candidate matrix, meta has
-# feature/group/category, block_id covers all rows. Deterministic for a
-# given seed (ranger runs single-threaded with a fixed seed).
+# feature/group/category, block_id covers all rows. The RNG is not seeded
+# here: gcf_select() seeds (and afterwards restores) the R generator only
+# when the user supplies `seed`, and the same seed is passed to ranger
+# (single-threaded), so `seed = 1` reproduces the paper's selection exactly.
 gcf_select_rfimp_core <- function(X, y, meta, train_rows, block_id,
                                   params = list()) {
   p <- utils::modifyList(list(B = 80L, subsample_frac = 0.7, pi = 0.6,
-                              ktop = 20L, rf_trees = 200L, seed = 1L), params)
+                              ktop = 20L, rf_trees = 200L), params)
   is_X <- meta$category == "X"; pen <- which(!is_X); x_cols <- meta$feature[is_X]
-  set.seed(p$seed)
   Ztr <- X[train_rows, , drop = FALSE]; ytr <- y[train_rows]
   btr <- block_id[train_rows]; blocks <- unique(btr)
   kt <- floor(p$subsample_frac * length(blocks))
@@ -1020,7 +1021,7 @@ gcf_select_rfimp_core <- function(X, y, meta, train_rows, block_id,
     sub <- which(btr %in% sample(blocks, kt))
     rf <- ranger::ranger(x = Ztr[sub, , drop = FALSE], y = ytr[sub],
                          num.trees = p$rf_trees, importance = "impurity",
-                         seed = 1, num.threads = 1)
+                         seed = p$seed, num.threads = 1)
     imp <- rf$variable.importance[meta$feature[pen]]; imp[is.na(imp)] <- 0
     sel[b, ] <- rank(-imp, ties.method = "first") <= p$ktop
   }
@@ -1053,11 +1054,14 @@ gcf_blocks <- function(coords, size) {
 # (variable x category) group voting with fire threshold `pi_thr` -- each
 # qualifying group contributes its most frequently kept member. Defaults are
 # the paper settings (B = 80, subsample_frac = 0.7, pi_thr = 0.6, ktop = 20,
-# num_trees = 200, seed = 1). Returns a "gcf_selection" object with
-# $selected, $forced, $derived, $freq, $group_fire, $params.
+# num_trees = 200). `seed = NULL` (default) leaves R's random number
+# generator untouched; pass `seed = 1` (the paper setting) for a
+# reproducible selection -- the generator state is restored on exit.
+# Returns a "gcf_selection" object with $selected, $forced, $derived,
+# $freq, $group_fire, $params.
 gcf_select <- function(x, y, blocks, train = NULL, B = 80,
                        subsample_frac = 0.7, pi_thr = 0.6, ktop = 20,
-                       num_trees = 200, seed = 1) {
+                       num_trees = 200, seed = NULL) {
   gcf_assert(is.list(x) && !is.null(x$candidates) && !is.null(x$meta),
              "x must be a gcf_field object (or a list with candidates and meta).")
   X <- as.matrix(x$candidates)
@@ -1069,6 +1073,19 @@ gcf_select <- function(x, y, blocks, train = NULL, B = 80,
   gcf_assert(length(blocks) == nrow(X),
              "blocks must have one id per location; see gcf_blocks().")
   if (is.null(train)) train <- seq_len(nrow(X))
+  if (!is.null(seed)) {
+    gcf_assert(length(seed) == 1L && is.numeric(seed) && is.finite(seed),
+               "seed must be a single finite number or NULL.")
+    # Seed only on request, and hand the caller's RNG state back on exit.
+    if (exists(".Random.seed", envir = globalenv(), inherits = FALSE)) {
+      old_seed <- get(".Random.seed", envir = globalenv())
+      on.exit(assign(".Random.seed", old_seed, envir = globalenv()),
+              add = TRUE)
+    } else {
+      on.exit(rm(list = ".Random.seed", envir = globalenv()), add = TRUE)
+    }
+    set.seed(seed)
+  }
   core <- gcf_select_rfimp_core(
     X, y, meta, train_rows = train, block_id = blocks,
     params = list(B = as.integer(B), subsample_frac = subsample_frac,
