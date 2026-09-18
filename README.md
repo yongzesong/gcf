@@ -55,6 +55,34 @@ The pipeline: `x -> psi (pattern) -> Z_x (context) -> functional reduction -> se
 4. `gcf_select()` — Step 3b: stable variable selection (random forest importance + spatial-block stability + group voting), with the block helper `gcf_blocks()`;
 5. `gcf_field()` — runs Steps 1–3a in one call.
 
+## GCF features in the case study
+
+In the case study of the paper, vascular plant species richness across the Southwest Australian Floristic Region, GCF expands the 12 original spatial predictors `x(s)` into 3,276 candidate predictors. The figure below (Figure 5 in the paper) shows the expansion on the left and maps the nine derived features retained by the full-sample variable selection on the right.
+
+![GCF features: (a) spatial pattern features and (b) neighbourhood distribution features derived from the 12 original predictors](figures/gcf-features.jpg)
+
+**(a) Spatial pattern features `ψ(x)(s)`** quantify the local spatial structure of each predictor, such as spatial dependence, heterogeneity, geocomplexity, multiscale variation and local outlyingness. Nine operators are computed over nine buffer radii `b` and two operators are computed once per predictor, which gives 9 (ψ) × 12 (x) × 9 (b) + 2 (ψ) × 12 (x) = 996 features. The maps show the log local variance `ψ_V` of slope and precipitation, and the positive z-outlier strength `ψ_P` of distance to built-up areas.
+
+**(b) Neighbourhood distribution features `Z_x(s; b, τ)`** summarize the values of each predictor within the neighbourhood of a location using buffer-wise quantiles. Nine buffer radii `b` and 21 quantile levels `τ` = {0, 0.05, ..., 1} give 12 (x) × 9 (b) × 21 (τ) = 2,268 features. The maps show the neighbourhood quantile `Z_τ` of precipitation (τ = 0.9), distance to built-up areas (0.5), soil clay (0.1), soil depth (0.9) and soil pH (0.5), and the neighbourhood interquartile range `IQR Z` of soil organic carbon. For example, `Z_0.9` of precipitation highlights areas influenced by high-rainfall neighbourhoods, and `IQR Z` of soil organic carbon identifies zones with strong local variability.
+
+| Predictor category | Count |
+|---|---|
+| Original predictors `x(s)` | 12 |
+| Spatial pattern features `ψ(x)(s)` | 996 |
+| Neighbourhood distribution features `Z_x(s; b, τ)` | 2,268 |
+| **Total candidate predictors in GCF** | **3,276** |
+
+Table 7 in the paper gives the Shapley decomposition of the spatial-block cross-validated R² of the random forest model across the three predictor categories. The original covariates contribute 45.6%, and the two GCF-derived feature families together contribute more than half of the explained variance.
+
+| Category | Shapley φ | Share |
+|---|---|---|
+| `x` (covariates) | 0.158 | 0.456 |
+| `ψ` (spatial pattern) | 0.086 | 0.248 |
+| `Z_x` (neighbourhood distribution) | 0.102 | 0.296 |
+| Sum | 0.346 | 1.000 |
+
+φ is the Shapley contribution of each predictor category to the GCF spatial-block R². The three φ values sum to the GCF total (R² = 0.346) by construction.
+
 ## Usage
 
 Dependencies (install once from CRAN): `sf`, `spdep`, `geocomplexity`, `ranger`. Requires R >= 4.1.
